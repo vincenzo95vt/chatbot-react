@@ -4,13 +4,13 @@ import ChatbotIcon from '../ChatbotIcon/ChatbotIcon'
 import ChatformComponent from '../ChatformComponent/ChatformComponent'
 import ChatMessage from '../ChatMessage/ChatMessage'
 
-const ChatbotComponent = () => {
+const ChatbotComponent = ({setShowChatbot}) => {
     const [chatHistory, setChatHistory] = useState([]);
     const chatBodyRef = useRef();
 
     const generateBotResponse = async (history) => {
-        const updateHistory = (text) => {
-            setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."), {role: "model", text}])
+        const updateHistory = (text, isError = false) => {
+            setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."), {role: "model", text, isError }])
         }
         
         history = history.map(({role, text}) => ({role, parts: [{text}]}))
@@ -32,7 +32,7 @@ const ChatbotComponent = () => {
             updateHistory(apiResponseText)
             console.log(data)
         } catch (error) {
-            
+            updateHistory(error.message, true);
         }
     }
 
@@ -47,7 +47,7 @@ const ChatbotComponent = () => {
             <ChatbotIcon/>
             <h2 className="logo-text">Chatbot</h2>
           </div>
-          <button class="material-symbols-rounded">keyboard_arrow_down</button>    
+          <button onClick={() => setShowChatbot(prev => !prev)} class="material-symbols-rounded">keyboard_arrow_down</button>    
         </div>
         <div ref={chatBodyRef} className="chat-body">
           <div className="message bot-message">

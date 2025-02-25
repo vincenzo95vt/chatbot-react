@@ -12,14 +12,14 @@ const ChatformComponent = ({chatHistory, setChatHistory, generateBotResponse}) =
 
         setChatHistory(history => [...history, {role: "user", text: userMessage}])
         setTimeout(() => {
-            setChatHistory(history => [...history, {role: "model", text: "Thinking..."}])
+            setChatHistory(history => [...history, {role: "model", text: "Pensando..."}])
             generateBotResponse([...chatHistory, {role:"user", text: userMessage}]);        
         },
         600)
     }
   return (
     <form action="#" className="chat-form" onSubmit={handleFormSubmit}>
-            <input ref={inputRef} type="text" placeholder='Message...' className="message-input" required/>
+            <input ref={inputRef} type="text" placeholder='Mensaje...' className="message-input" required/>
             <button class="material-symbols-rounded">arrow_upward</button>
     </form>
   )

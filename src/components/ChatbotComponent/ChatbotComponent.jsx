@@ -3,6 +3,7 @@ import "./ChatbotComponent.css"
 import ChatbotIcon from '../ChatbotIcon/ChatbotIcon'
 import ChatformComponent from '../ChatformComponent/ChatformComponent'
 import ChatMessage from '../ChatMessage/ChatMessage'
+import { fetchResponse } from '../../core/services/services'
 
 const ChatbotComponent = ({setShowChatbot}) => {
     const [chatHistory, setChatHistory] = useState([]);
@@ -10,29 +11,15 @@ const ChatbotComponent = ({setShowChatbot}) => {
 
     const generateBotResponse = async (history) => {
         const updateHistory = (text, isError = false) => {
-            setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."), {role: "model", text, isError }])
+            setChatHistory(prev => [...prev.filter(msg => msg.text !== "Pensando..."), {role: "model", text, isError }])
         }
         
         history = history.map(({role, text}) => ({role, parts: [{text}]}))
 
-        const requestOpstions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                },
-            body: JSON.stringify({contents: history})
-        }
-
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL, requestOpstions);
-            const data = await response.json();
-            if(!response.ok) throw new Error(data.error.message || "Algo ha ido mal...");
-
-            const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
-            updateHistory(apiResponseText)
-            console.log(data)
-        } catch (error) {
-            updateHistory(error.message, true);
+        const response = await fetchResponse(history)
+        updateHistory(response);
+        if(response === "error"){
+          updateHistory("Error", true)
         }
     }
 
@@ -53,7 +40,7 @@ const ChatbotComponent = ({setShowChatbot}) => {
           <div className="message bot-message">
             <ChatbotIcon/>
             <p className="message-text">
-              Hello! How can I assist you today?
+              Hola! En que puedo ayudarte hoy?
             </p>
           </div>
           {chatHistory.map((chat, idx) => (
